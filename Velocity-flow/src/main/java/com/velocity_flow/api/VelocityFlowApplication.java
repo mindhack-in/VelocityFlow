@@ -1,0 +1,13 @@
+package com.velocity_flow.api;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class VelocityFlowApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(VelocityFlowApplication.class, args);
+	}
+
+}
