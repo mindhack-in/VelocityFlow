@@ -1,9 +1,9 @@
 package com.velocity_flow.api.dto.response.base;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataMap {
-	private Set<String> keysToShow = new HashSet<>();
+	private List<String> keysToShow = new ArrayList<>();
 	private Map<String, String> ignoreCamelCase = new HashMap<>();
 	private Integer ribbonCount;
 }

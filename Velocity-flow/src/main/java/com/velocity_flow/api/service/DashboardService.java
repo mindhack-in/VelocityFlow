@@ -1,9 +1,8 @@
 package com.velocity_flow.api.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
@@ -58,7 +57,7 @@ public class DashboardService {
 
 		List<Project> projects = projectRepository.findByOrganizationId(organizationId);
 
-		Set<String> workFlows = new HashSet<>();
+		List<String> workFlows = new ArrayList<>();
 		List<Task> tasks = new ArrayList<>();
 
 		List<Long> projectIds = projects.stream().map(Project::getId).toList();
@@ -71,8 +70,11 @@ public class DashboardService {
 
 		List<WorkflowState> workflowStates = workflowStateRepository.findByWorkflowIdIn(workflowIds);
 
-		workflowStates.stream().map(WorkflowState::getName).forEach(workFlows::add);
-
+		workflowStates.stream()
+	    .sorted(Comparator.comparing(WorkflowState::getSequenceNo))
+	    .map(WorkflowState::getName)
+	    .forEach(workFlows::add);
+		
 		DataMap dataMap = new DataMap();
 		dataMap.setKeysToShow(workFlows);
 
@@ -96,6 +98,7 @@ public class DashboardService {
 				task.getTaskType() != null ? task.getTaskType().getId() : null,
 				task.getParentTask() != null ? task.getParentTask().getId() : null, task.getTaskLevel(),
 				task.getRankOrder(), task.getAssignee() != null ? task.getAssignee().getId() : null, task.getTitle(),
-				task.getPriority(), task.getStatus(), task.getDueDate(), labelIds, task.getCreatedOn(), task.getUpdatedOn());
+				task.getPriority(), task.getStatus(), task.getDueDate(), labelIds, task.getCreatedOn(),
+				task.getUpdatedOn());
 	}
 }
