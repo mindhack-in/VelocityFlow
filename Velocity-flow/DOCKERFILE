@@ -1,0 +1,29 @@
+FROM eclipse-temurin:21-jdk AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
+
+# FIX: Give execute permission to mvnw
+RUN chmod +x mvnw
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline
+
+COPY src src
+
+# Build the application
+RUN ./mvnw clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+ENV PORT=8080
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","app.jar"]
