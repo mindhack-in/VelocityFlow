@@ -282,7 +282,7 @@
       width: 500px;
       height: 100vh;
       background: white;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      box-shadow: -10px 0 30px rgba(188, 102, 102, 0.1);
       transition: 0.3s ease;
       z-index: 100;
       overflow-y: auto;
@@ -545,7 +545,6 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="brand" style="display: flex; align-items: center; gap: 12px;">
-        <img src="logo.png" alt="Logo" style="height: 200px; width: auto; object-fit: contain;" />
         <span>VelocityDesk</span>
       </div>
 
@@ -1015,7 +1014,7 @@
     // VELOCITYDESK REAL API INTEGRATION
     // =========================
 
-    const API_BASE_URL = window.location.origin;
+    const API_BASE_URL = "http://localhost:9090";
 
     const API = {
       async request(endpoint, method = 'GET', body = null) {
