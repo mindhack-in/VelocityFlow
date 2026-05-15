@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-public interface CreateEntity<CreateRequest, UpdateRequest, APIReponse> {
+public interface CreateEntity<CreateRequest, UpdateRequest, APIReponse>
+		extends GetAllEntity<CreateRequest, UpdateRequest, APIReponse>{
 
 	@PostMapping
 	public APIReponse create(@RequestBody CreateRequest createRequest);
@@ -17,9 +18,6 @@ public interface CreateEntity<CreateRequest, UpdateRequest, APIReponse> {
 
 	@GetMapping("/{id}")
 	public APIReponse get(@PathVariable("id") Long id);
-
-	@GetMapping
-	public APIReponse getAll();
 
 	@DeleteMapping("/{id}")
 	public APIReponse Delete(@PathVariable("id") Long id);

@@ -19,10 +19,6 @@ public class Sprint extends BaseEntity {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_id")
-    private Workflow workflow;
-
     private String name;
 
     @Column(name = "capacity_hours")

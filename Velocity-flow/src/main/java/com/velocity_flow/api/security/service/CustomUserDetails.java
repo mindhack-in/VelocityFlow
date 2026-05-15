@@ -15,11 +15,17 @@ import com.velocity_flow.api.entity.User;
  */
 public class CustomUserDetails implements UserDetails {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final Long id;
 	private final String email;
 	private final String password;
 	private final Collection<? extends GrantedAuthority> authorities;
 	private final String status;
+	private final String role;
+	private final Long organizationId;
 
 	public CustomUserDetails(User user) {
 		this.id = user.getId();
@@ -35,10 +41,20 @@ public class CustomUserDetails implements UserDetails {
 		} else {
 			this.authorities = List.of();
 		}
+		this.role = user.getRole().getName();
+		this.organizationId = user.getOrganization().getId();
 	}
 
 	public Long getId() {
 		return id;
+	}
+
+	public Long getorganizationId() {
+		return organizationId;
+	}
+
+	public String getRole() {
+		return this.role;
 	}
 
 	@Override

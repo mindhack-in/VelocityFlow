@@ -1,5 +1,6 @@
 package com.velocity_flow.api.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.velocity_flow.api.controller.base.CreateEntity;
@@ -13,5 +14,8 @@ import com.velocity_flow.api.dto.response.base.DataMap;
 public interface MemberUserController
 		extends CreateEntity<UserCreateRequest, UserUpdateRequest, BaseResponse<DataMap, UserOperationResponse>> {
 	public static final String INSIGHTAPI = "/member-user";
+
+	@GetMapping("/organization")
+	public BaseResponse<DataMap, UserOperationResponse> getByOrganization();
 
 }

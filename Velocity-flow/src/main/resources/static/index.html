@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VelocityDesk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #0f172a;
+      color: white;
+      padding: 24px 18px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    .brand {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: #38bdf8;
+    }
+
+    .menu-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin: 24px 0 12px;
+      letter-spacing: 1px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: 0.2s ease;
+      color: #e2e8f0;
+    }
+
+    .menu-item:hover,
+    .menu-item.active {
+      background: #1e293b;
+    }
+
+    .main {
+      flex: 1;
+      margin-left: 260px;
+    }
+
+    .topbar {
+      height: 72px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .search-box input {
+      width: 320px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      outline: none;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #0ea5e9;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .content {
+      padding: 28px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+    }
+
+    .primary-btn {
+      border: none;
+      background: #0284c7;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .card .value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .table-wrapper {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+      margin-bottom: 28px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f8fafc;
+    }
+
+    th,
+    td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    th {
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .status {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status.active {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status.pending {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .kanban-column {
+      background: #e2e8f0;
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 500px;
+    }
+
+    .kanban-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .kanban-header h3 {
+      font-size: 15px;
+    }
+
+    .task-card {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+    }
+
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .task-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .priority {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .priority.high {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .priority.medium {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -500px;
+      width: 500px;
+      height: 100vh;
+      background: white;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      transition: 0.3s ease;
+      z-index: 100;
+      overflow-y: auto;
+      padding: 28px;
+    }
+
+    .drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .drawer-section {
+      margin-bottom: 24px;
+    }
+
+    .drawer-section h4 {
+      margin-bottom: 10px;
+      color: #334155;
+    }
+
+    .comment-box {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      width: 500px;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .modal h2 {
+      margin-bottom: 0;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+      transition: 0.2s;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .close-btn:hover {
+      color: #1e293b;
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .secondary-btn {
+      background: #e2e8f0;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    @media(max-width: 1100px) {
+      .kanban {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .kanban {
+        grid-template-columns: 1fr;
+      }
+
+      .search-box input {
+        width: 180px;
+      }
+    }
+
+    /* ----- Login (same visual language as app) ----- */
+    .hidden {
+      display: none !important;
+    }
+
+    .login-root {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: linear-gradient(160deg, #e0f2fe 0%, #f5f7fb 45%, #f8fafc 100%);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+      border: 1px solid #e2e8f0;
+    }
+
+    .login-brand {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .login-brand span {
+      color: #38bdf8;
+    }
+
+    .login-sub {
+      text-align: center;
+      color: #64748b;
+      font-size: 15px;
+      margin-bottom: 32px;
+    }
+
+    .login-error {
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .login-error.visible {
+      display: block;
+    }
+
+    .login-actions {
+      margin-top: 8px;
+    }
+
+    .login-actions .primary-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+    }
+
+    .text-link {
+      background: none;
+      border: none;
+      color: #0284c7;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    #dynamicCrudModal .modal {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .page-note {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 16px;
+      max-width: 720px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginView" class="login-root">
+    <div class="login-card">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <img src="logo.png" alt="VelocityDesk Logo" style="height: 200px; width: auto; object-fit: contain;" />
+      </div>
+      <p class="login-sub">Sign in to open your workspace</p>
+      <div id="loginError" class="login-error" role="alert"></div>
+      <form id="loginForm" autocomplete="on">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" name="email" type="email" required placeholder="you@company.com" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" name="password" type="password" required placeholder="••••••••" />
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="primary-btn" id="loginSubmit">Sign in</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="appView" class="hidden">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand" style="display: flex; align-items: center; gap: 12px;">
+        <img src="logo.png" alt="Logo" style="height: 200px; width: auto; object-fit: contain;" />
+        <span>VelocityDesk</span>
+      </div>
+
+      <div class="menu-title">Main</div>
+      <div class="menu-item active" data-nav="dashboard" role="button" tabindex="0">📊 Dashboard</div>
+      <div class="menu-item" data-nav="kanban" role="button" tabindex="0">📋 Kanban Board</div>
+      <div class="menu-item" data-nav="organizations" role="button" tabindex="0">🏢 Organizations</div>
+      <div class="menu-item" data-nav="roles" role="button" tabindex="0">🛡 Roles</div>
+      <div class="menu-item" data-nav="permissions" role="button" tabindex="0">🔑 Permissions</div>
+      <div class="menu-item" data-nav="admin-users" role="button" tabindex="0">👤 Admin Users</div>
+
+      <div class="menu-title">Management</div>
+      <div class="menu-item" data-nav="projects" role="button" tabindex="0">📁 Projects</div>
+      <div class="menu-item" data-nav="teams" role="button" tabindex="0">👥 Teams</div>
+      <div class="menu-item" data-nav="sprints" role="button" tabindex="0">🚀 Sprints</div>
+      <div class="menu-item" data-nav="workflows" role="button" tabindex="0">🔄 Workflows</div>
+      <div class="menu-item" data-nav="task-types" role="button" tabindex="0">🏷 Task Types</div>
+      <div class="menu-item" data-nav="labels" role="button" tabindex="0">🔖 Labels</div>
+      <div class="menu-item" data-nav="tasks" role="button" tabindex="0">✅ Tasks</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="search-box">
+          <input type="text" placeholder="Search tasks, projects, users..." />
+        </div>
+
+        <div class="profile">
+          <div>
+            <div style="font-weight:600" id="topbarUserName">—</div>
+            <div style="font-size:12px;color:#64748b" id="topbarUserRole">Signed in</div>
+          </div>
+          <div class="avatar" id="topbarAvatar">?</div>
+          <button type="button" class="secondary-btn" id="logoutBtn" style="margin-left:8px">Log out</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div id="page-dashboard" class="page-panel">
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p id="welcomeSubline" style="margin-top:6px;color:#64748b">Welcome back to VelocityDesk</p>
+          </div>
+          <button type="button" class="primary-btn" onclick="if (window.navigateTo) window.navigateTo('tasks')">Manage tasks</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="card">
+            <h3>Total Organizations</h3>
+            <div class="value" id="stat-orgs">—</div>
+          </div>
+
+          <div class="card">
+            <h3>Total Projects</h3>
+            <div class="value" id="stat-projects">—</div>
+          </div>
+
+          <div class="card">
+            <h3>Sprints</h3>
+            <div class="value" id="stat-sprints">—</div>
+          </div>
+
+          <div class="card">
+            <h3>Tasks</h3>
+            <div class="value" id="stat-tasks">—</div>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Slug</th>
+                <th>Organization ID</th>
+                <th>Status</th>
+                <th>Visibility</th>
+              </tr>
+            </thead>
+            <tbody id="dashboardProjectsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="page-header" style="margin-top:40px">
+          <div>
+            <h1>Task board</h1>
+            <p style="margin-top:6px;color:#64748b">Use Tasks in the sidebar to view and create work items.</p>
+          </div>
+        </div>
+
+        <div class="card" style="box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05)">
+          <p style="font-size:14px;color:#64748b;line-height:1.6">
+            Kanban columns are not wired to workflow states in this shell. Open <strong>Tasks</strong> for the live list from the API.
+          </p>
+        </div>
+        </div>
+
+        <div id="page-organizations" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Organizations</h1>
+              <p style="margin-top:6px;color:#64748b">Create and manage organizations</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="organizations">+ Add organization</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Slug</th>
+                  <th>Created</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orgTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-roles" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Roles</h1>
+              <p style="margin-top:6px;color:#64748b">Roles and permission bindings</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="roles">+ Add role</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Permission IDs</th>
+                  <th>Created</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rolesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-permissions" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Permissions</h1>
+              <p style="margin-top:6px;color:#64748b">Authority keys assigned to roles (<code>/permissions</code>)</p>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="permissionsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-admin-users" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Admin users</h1>
+              <p style="margin-top:6px;color:#64748b">Administrative accounts (<code>/admin-user</code>)</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="admin-users">+ Add admin user</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Role</th>
+                  <th>Organization</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-projects" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Projects</h1>
+              <p style="margin-top:6px;color:#64748b">Projects within organizations</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="projects">+ Add project</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Slug</th>
+                  <th>Organization</th>
+                  <th>Status</th>
+                  <th>Visibility</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="projectsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-teams" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Teams</h1>
+              <p class="page-note">Member directory via <code>/member-user</code> (same user model as admin; filtered by your permissions).</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="teams">+ Add member</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Role</th>
+                  <th>Organization</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="teamsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-sprints" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Sprints</h1>
+              <p style="margin-top:6px;color:#64748b">Sprints linked to projects and workflows</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="sprints">+ Add sprint</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Project</th>
+                  <th>Workflow</th>
+                  <th>Capacity h</th>
+                  <th>Planned SP</th>
+                  <th>Done SP</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sprintsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-workflows" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Workflows</h1>
+              <p style="margin-top:6px;color:#64748b">Workflow definitions per project</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="workflows">+ Add workflow</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Project</th>
+                  <th>Reusable</th>
+                  <th style="min-width: 200px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="workflowsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-kanban" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Kanban Board</h1>
+              <p class="page-note">Interactive visual board for task workflow management.</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="tasks">+ Create Task</button>
+          </div>
+          <div class="kanban-board" id="kanbanBoardContainer" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; min-height: 500px;">
+          </div>
+        </div>
+
+        <div id="page-task-types" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Task Types</h1>
+              <p class="page-note">Manage customized task classifications and visual indicators.</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="task-types">+ Add task type</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Icon</th>
+                  <th>Color</th>
+                  <th>Project</th>
+                  <th>Workflow</th>
+                  <th style="min-width: 120px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="taskTypesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-labels" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Labels</h1>
+              <p class="page-note">Create and manage color-coded labels for tagging tasks.</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="labels">+ Add label</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Color</th>
+                  <th>Project</th>
+                  <th style="min-width: 120px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="labelsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="page-tasks" class="page-panel hidden">
+          <div class="page-header">
+            <div>
+              <h1>Tasks</h1>
+              <p class="page-note">Create, update, and manage workspace tasks.</p>
+            </div>
+            <button type="button" class="primary-btn crud-add" data-view="tasks">+ Add task</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Priority</th>
+                  <th>Project</th>
+                  <th>Sprint</th>
+                  <th>Type</th>
+                  <th>Due</th>
+                  <th style="min-width: 120px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tasksTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  </div>
+
+  <div class="modal-overlay" id="dynamicCrudModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="dynamicCrudHeading">Edit</h2>
+        <button type="button" class="close-btn" id="dynamicCrudClose">&times;</button>
+      </div>
+      <input type="hidden" id="crudRecordId" value="" />
+      <div id="dynamicCrudBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" id="dynamicCrudCancel">Cancel</button>
+        <button type="button" class="primary-btn" id="dynamicCrudSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app-entity-crud.js"></script>
+  <script>
+    const loginView = document.getElementById('loginView');
+    const appView = document.getElementById('appView');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const loginSubmit = document.getElementById('loginSubmit');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const topbarUserName = document.getElementById('topbarUserName');
+    const topbarUserRole = document.getElementById('topbarUserRole');
+    const topbarAvatar = document.getElementById('topbarAvatar');
+
+    function initialsFromEmail(email) {
+      if (!email) return '?';
+      const local = email.split('@')[0] || '';
+      const parts = local.replace(/[^a-zA-Z0-9]/g, ' ').trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase().slice(0, 2);
+      return local.slice(0, 2).toUpperCase() || '?';
+    }
+
+    function setLoginError(msg) {
+      if (!msg) {
+        loginError.textContent = '';
+        loginError.classList.remove('visible');
+        return;
+      }
+      loginError.textContent = msg;
+      loginError.classList.add('visible');
+    }
+
+    function displayNameFromEmail(email) {
+      if (!email) return 'User';
+      const local = email.split('@')[0] || '';
+      const cleaned = local.replace(/[._-]+/g, ' ').trim();
+      if (!cleaned) return email;
+      return cleaned.split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    }
+
+    function updateWelcomeSubline() {
+      const el = document.getElementById('welcomeSubline');
+      if (!el) return;
+      const email = localStorage.getItem('userEmail') || '';
+      const name = displayNameFromEmail(email);
+      el.textContent = name === 'User' ? 'Welcome back to VelocityDesk' : `Welcome back, ${name}.`;
+    }
+
+    function updateTopbarFromSession() {
+      const email = localStorage.getItem('userEmail') || '';
+      topbarUserName.textContent = email || 'User';
+      topbarUserRole.textContent = 'Signed in';
+      topbarAvatar.textContent = initialsFromEmail(email);
+      updateWelcomeSubline();
+    }
+
+    function showAppShell() {
+      loginView.classList.add('hidden');
+      appView.classList.remove('hidden');
+      updateTopbarFromSession();
+    }
+
+    function showLoginScreen() {
+      appView.classList.add('hidden');
+      loginView.classList.remove('hidden');
+    }
+
+    function clearSession() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('userEmail');
+    }
+
+    // =========================
+    // VELOCITYDESK REAL API INTEGRATION
+    // =========================
+
+    const API_BASE_URL = window.location.origin;
+
+    const API = {
+      async request(endpoint, method = 'GET', body = null) {
+        const token = localStorage.getItem('accessToken');
+
+        const config = {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        };
+
+        if (body) {
+          config.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+        if (response.status === 401) {
+          clearSession();
+          showLoginScreen();
+          setLoginError('Your session expired. Please sign in again.');
+          showToast('Session expired');
+          throw new Error('401');
+        }
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+
+        return response.json();
+      }
+    };
+
+    // =========================
+    // AUTH (same contract as Postman: POST /auth/login → accessToken)
+    // =========================
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setLoginError('');
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      loginSubmit.disabled = true;
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          setLoginError(data.message || data.error || `Sign in failed (${response.status})`);
+          return;
+        }
+        const token = data.accessToken || data.token;
+        if (!token) {
+          setLoginError('No token in response.');
+          return;
+        }
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('userEmail', email);
+        showToast('Login successful');
+        showAppShell();
+        await initializeDashboard();
+      } catch (err) {
+        console.error(err);
+        setLoginError('Network error. Is the API running?');
+      } finally {
+        loginSubmit.disabled = false;
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      clearSession();
+      showLoginScreen();
+      document.getElementById('loginPassword').value = '';
+      showToast('Signed out');
+    });
+
+    async function loadDashboardProjects() {
+      const tbody = document.getElementById('dashboardProjectsBody');
+      if (!tbody) return;
+      tbody.replaceChildren();
+      const loading = document.createElement('tr');
+      const loadingTd = document.createElement('td');
+      loadingTd.colSpan = 5;
+      loadingTd.textContent = 'Loading…';
+      loading.appendChild(loadingTd);
+      tbody.appendChild(loading);
+      try {
+        const data = await API.request('/projects');
+        const list = Array.isArray(data.dataList) ? data.dataList : [];
+        tbody.replaceChildren();
+        if (list.length === 0) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 5;
+          td.textContent = 'No projects yet.';
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+        list.forEach((p) => {
+          const tr = document.createElement('tr');
+          [p.name, p.slug, p.organizationId, p.status, p.visibility].forEach((val) => {
+            const td = document.createElement('td');
+            td.textContent = val != null ? String(val) : '';
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        if (error.message === '401') return;
+        tbody.replaceChildren();
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.textContent = 'Could not load projects.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function getTasks() {
+      try {
+        await API.request('/tasks');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function getSprints() {
+      try {
+        await API.request('/sprints');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // =========================
+    // PERMISSION CHECKS
+    // =========================
+
+    function hasPermission(permission) {
+      const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+
+      return permissions.includes(permission);
+    }
+
+    // =========================
+    // TOAST NOTIFICATIONS
+    // =========================
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+
+      toast.innerText = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.right = '20px';
+      toast.style.background = '#0f172a';
+      toast.style.color = 'white';
+      toast.style.padding = '14px 18px';
+      toast.style.borderRadius = '10px';
+      toast.style.zIndex = '9999';
+      toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // =========================
+    // INITIAL DATA LOADERS
+    // =========================
+
+    function countDataList(body) {
+      if (!body || !Array.isArray(body.dataList)) return 0;
+      return body.dataList.length;
+    }
+
+    async function refreshDashboardStats() {
+      const pairs = [
+        ['stat-orgs', '/organizations'],
+        ['stat-projects', '/projects'],
+        ['stat-sprints', '/sprints'],
+        ['stat-tasks', '/tasks']
+      ];
+      await Promise.all(
+        pairs.map(async ([elementId, path]) => {
+          const el = document.getElementById(elementId);
+          try {
+            const data = await API.request(path);
+            if (el) el.textContent = String(countDataList(data));
+          } catch (e) {
+            if (e.message === '401') return;
+            if (el) el.textContent = '—';
+          }
+        })
+      );
+    }
+
+    async function initializeDashboard() {
+      try {
+        await refreshDashboardStats();
+        await loadDashboardProjects();
+        await getTasks();
+        await getSprints();
+      } catch (error) {
+        if (error.message !== '401') {
+          console.error('Initialization failed', error);
+        }
+      }
+    }
+
+    window.showToast = showToast;
+    window.refreshDashboardStats = refreshDashboardStats;
+    registerEntityCrud(API);
+
+    (function bootSession() {
+      if (localStorage.getItem('accessToken')) {
+        showAppShell();
+        initializeDashboard();
+      } else {
+        showLoginScreen();
+      }
+    })();
+
+    document.querySelectorAll('.menu-item[data-nav]').forEach((item) => {
+      item.addEventListener('click', () => {
+        const view = item.getAttribute('data-nav');
+        if (view) window.navigateTo(view);
+      });
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.click();
+        }
+      });
+    });
+
+  </script>
+</body>
+</html>

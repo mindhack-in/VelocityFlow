@@ -47,6 +47,9 @@ public class Task extends BaseEntity {
 
     private String priority;
 
+    @Column(name = "status")
+    private String status;
+
     @Column(name = "due_date")
     private LocalDate dueDate;
 
