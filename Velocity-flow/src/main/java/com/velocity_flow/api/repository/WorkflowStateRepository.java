@@ -10,4 +10,7 @@ import com.velocity_flow.api.entity.WorkflowState;
 @Repository
 public interface WorkflowStateRepository extends JpaRepository<WorkflowState, Long> {
 	List<WorkflowState> findByWorkflowIdIn(List<Long> workflowIds);
+
+	List<WorkflowState> findByWorkflowIdAndName(Long id,String name);
+
 }

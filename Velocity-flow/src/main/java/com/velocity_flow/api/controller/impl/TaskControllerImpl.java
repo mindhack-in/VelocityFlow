@@ -47,4 +47,10 @@ public class TaskControllerImpl implements TaskController {
     public BaseResponse<DataMap, TaskOperationResponse> Delete(Long id) {
         return taskService.delete(id);
     }
+
+	@Override
+	public BaseResponse<DataMap, TaskOperationResponse> updateStatus(Long id,String status) {
+        return taskService.update(status,id);
+
+	}
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +14,11 @@
       padding: 0;
       box-sizing: border-box;
       font-family: 'Inter', sans-serif;
+    }
+
+    .kanban-dashboard {
+      overflow-x: auto;
+      display: flex;
     }
 
     body {
@@ -53,6 +59,44 @@
       letter-spacing: 1px;
     }
 
+    .kanban {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      /* scroll-behavior: smooth; */
+    }
+
+    .kanban-column {
+      min-width: 320px;
+      width: 320px;
+      flex-shrink: 0;
+      flex:0 0 320px;
+    }
+
+    #kanbanBoardContainer {
+  display: flex;
+  gap: 18px;
+
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-bottom: 12px;
+
+  white-space: nowrap;
+}
+
+#kanbanBoardContainer::-webkit-scrollbar {
+  height: 10px;
+}
+
+#kanbanBoardContainer::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 10px;
+}
     .menu-item {
       display: flex;
       align-items: center;
@@ -72,6 +116,8 @@
 
     .main {
       flex: 1;
+        min-width: 0;
+
       margin-left: 260px;
     }
 
@@ -140,10 +186,16 @@
     }
 
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      display: flex;
       gap: 18px;
       margin-bottom: 30px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+
+    .stats-grid .card {
+      min-width: 240px;
+      flex: 1;
     }
 
     .card {
@@ -167,13 +219,14 @@
     .table-wrapper {
       background: white;
       border-radius: 16px;
-      overflow: hidden;
+      overflow-x: auto;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
       margin-bottom: 28px;
     }
 
     table {
-      width: 100%;
+      width: max-content;
+      min-width: 100%;
       border-collapse: collapse;
     }
 
@@ -187,6 +240,7 @@
       text-align: left;
       border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
+      white-space: nowrap;
     }
 
     th {
@@ -212,18 +266,49 @@
       color: #b45309;
     }
 
-    .kanban {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-top: 20px;
-    }
+   
+
 
     .kanban-column {
       background: #e2e8f0;
       border-radius: 16px;
       padding: 14px;
       min-height: 500px;
+      min-width: 320px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kanban-column.minimized {
+      min-width: 48px;
+      width: 48px;
+      padding: 14px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .kanban-column.minimized h3 {
+      writing-mode: vertical-lr;
+      text-orientation: mixed;
+      display: flex;
+      flex-direction: row;
+      /* In vertical mode, this makes items stack vertically */
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      flex: 1;
+    }
+
+    .kanban-column.minimized .kanban-cards,
+    .kanban-column.minimized .count,
+    .kanban-column.minimized h3 span:first-child::before {
+      /* hide emoji or other things if needed */
+    }
+
+    .kanban-column.minimized .kanban-cards {
+      display: none !important;
     }
 
     .kanban-header {
@@ -243,7 +328,7 @@
       padding: 14px;
       margin-bottom: 14px;
       cursor: grab;
-      box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
     }
 
     .task-title {
@@ -319,7 +404,7 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,0.5);
+      background: rgba(15, 23, 42, 0.5);
       display: none;
       align-items: center;
       justify-content: center;
@@ -402,11 +487,6 @@
       font-weight: 600;
     }
 
-    @media(max-width: 1100px) {
-      .kanban {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
 
     @media(max-width: 768px) {
       .sidebar {
@@ -417,10 +497,7 @@
         margin-left: 0;
       }
 
-      .kanban {
-        grid-template-columns: 1fr;
-      }
-
+     
       .search-box input {
         width: 180px;
       }
@@ -517,6 +594,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="loginView" class="login-root">
     <div class="login-card">
@@ -542,387 +620,390 @@
   </div>
 
   <div id="appView" class="hidden">
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand" style="display: flex; align-items: center; gap: 12px;">
-        <span>VelocityDesk</span>
-      </div>
-
-      <div class="menu-title">Main</div>
-      <div class="menu-item active" data-nav="dashboard" role="button" tabindex="0">📊 Dashboard</div>
-      <div class="menu-item" data-nav="kanban" role="button" tabindex="0">📋 Kanban Board</div>
-      <div class="menu-item" data-nav="organizations" role="button" tabindex="0">🏢 Organizations</div>
-      <div class="menu-item" data-nav="roles" role="button" tabindex="0">🛡 Roles</div>
-      <div class="menu-item" data-nav="permissions" role="button" tabindex="0">🔑 Permissions</div>
-      <div class="menu-item" data-nav="admin-users" role="button" tabindex="0">👤 Admin Users</div>
-
-      <div class="menu-title">Management</div>
-      <div class="menu-item" data-nav="projects" role="button" tabindex="0">📁 Projects</div>
-      <div class="menu-item" data-nav="teams" role="button" tabindex="0">👥 Teams</div>
-      <div class="menu-item" data-nav="sprints" role="button" tabindex="0">🚀 Sprints</div>
-      <div class="menu-item" data-nav="workflows" role="button" tabindex="0">🔄 Workflows</div>
-      <div class="menu-item" data-nav="task-types" role="button" tabindex="0">🏷 Task Types</div>
-      <div class="menu-item" data-nav="labels" role="button" tabindex="0">🔖 Labels</div>
-      <div class="menu-item" data-nav="tasks" role="button" tabindex="0">✅ Tasks</div>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <div class="search-box">
-          <input type="text" placeholder="Search tasks, projects, users..." />
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand" style="display: flex; align-items: center; gap: 12px;">
+          <span>VelocityDesk</span>
         </div>
 
-        <div class="profile">
-          <div>
-            <div style="font-weight:600" id="topbarUserName">—</div>
-            <div style="font-size:12px;color:#64748b" id="topbarUserRole">Signed in</div>
-          </div>
-          <div class="avatar" id="topbarAvatar">?</div>
-          <button type="button" class="secondary-btn" id="logoutBtn" style="margin-left:8px">Log out</button>
-        </div>
-      </header>
+        <div class="menu-title">Main</div>
+        <div class="menu-item active" data-nav="dashboard" role="button" tabindex="0">📊 Dashboard</div>
+        <div class="menu-item" data-nav="kanban" role="button" tabindex="0">📋 Kanban Board</div>
+        <div class="menu-item" data-nav="organizations" role="button" tabindex="0">🏢 Organizations</div>
+        <div class="menu-item" data-nav="roles" role="button" tabindex="0">🛡 Roles</div>
+        <div class="menu-item" data-nav="permissions" role="button" tabindex="0">🔑 Permissions</div>
+        <div class="menu-item" data-nav="admin-users" role="button" tabindex="0">👤 Admin Users</div>
 
-      <div class="content">
-        <div id="page-dashboard" class="page-panel">
-        <div class="page-header">
-          <div>
-            <h1>Dashboard</h1>
-            <p id="welcomeSubline" style="margin-top:6px;color:#64748b">Welcome back to VelocityDesk</p>
-          </div>
-          <button type="button" class="primary-btn" onclick="if (window.navigateTo) window.navigateTo('tasks')">Manage tasks</button>
-        </div>
+        <div class="menu-title">Management</div>
+        <div class="menu-item" data-nav="projects" role="button" tabindex="0">📁 Projects</div>
+        <div class="menu-item" data-nav="teams" role="button" tabindex="0">👥 Teams</div>
+        <div class="menu-item" data-nav="sprints" role="button" tabindex="0">🚀 Sprints</div>
+        <div class="menu-item" data-nav="workflows" role="button" tabindex="0">🔄 Workflows</div>
+        <div class="menu-item" data-nav="task-types" role="button" tabindex="0">🏷 Task Types</div>
+        <div class="menu-item" data-nav="labels" role="button" tabindex="0">🔖 Labels</div>
+        <div class="menu-item" data-nav="tasks" role="button" tabindex="0">✅ Tasks</div>
+      </aside>
 
-        <div class="stats-grid">
-          <div class="card">
-            <h3>Total Organizations</h3>
-            <div class="value" id="stat-orgs">—</div>
+      <main class="main">
+        <header class="topbar">
+          <div class="search-box">
+            <input type="text" placeholder="Search tasks, projects, users..." />
           </div>
 
-          <div class="card">
-            <h3>Total Projects</h3>
-            <div class="value" id="stat-projects">—</div>
-          </div>
-
-          <div class="card">
-            <h3>Sprints</h3>
-            <div class="value" id="stat-sprints">—</div>
-          </div>
-
-          <div class="card">
-            <h3>Tasks</h3>
-            <div class="value" id="stat-tasks">—</div>
-          </div>
-        </div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Project</th>
-                <th>Slug</th>
-                <th>Organization ID</th>
-                <th>Status</th>
-                <th>Visibility</th>
-              </tr>
-            </thead>
-            <tbody id="dashboardProjectsBody"></tbody>
-          </table>
-        </div>
-
-        <div class="page-header" style="margin-top:40px">
-          <div>
-            <h1>Task board</h1>
-            <p style="margin-top:6px;color:#64748b">Use Tasks in the sidebar to view and create work items.</p>
-          </div>
-        </div>
-
-        <div class="card" style="box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05)">
-          <p style="font-size:14px;color:#64748b;line-height:1.6">
-            Kanban columns are not wired to workflow states in this shell. Open <strong>Tasks</strong> for the live list from the API.
-          </p>
-        </div>
-        </div>
-
-        <div id="page-organizations" class="page-panel hidden">
-          <div class="page-header">
+          <div class="profile">
             <div>
-              <h1>Organizations</h1>
-              <p style="margin-top:6px;color:#64748b">Create and manage organizations</p>
+              <div style="font-weight:600" id="topbarUserName">—</div>
+              <div style="font-size:12px;color:#64748b" id="topbarUserRole">Signed in</div>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="organizations">+ Add organization</button>
+            <div class="avatar" id="topbarAvatar">?</div>
+            <button type="button" class="secondary-btn" id="logoutBtn" style="margin-left:8px">Log out</button>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Created</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="orgTableBody"></tbody>
-            </table>
-          </div>
-        </div>
+        </header>
 
-        <div id="page-roles" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Roles</h1>
-              <p style="margin-top:6px;color:#64748b">Roles and permission bindings</p>
+        <div class="content">
+          <div id="page-dashboard" class="page-panel">
+            <div class="page-header">
+              <div>
+                <h1>Dashboard</h1>
+                <p id="welcomeSubline" style="margin-top:6px;color:#64748b">Welcome back to VelocityDesk</p>
+              </div>
+              <button type="button" class="primary-btn"
+                onclick="if (window.navigateTo) window.navigateTo('tasks')">Manage tasks</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="roles">+ Add role</button>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Permission IDs</th>
-                  <th>Created</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="rolesTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-permissions" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Permissions</h1>
-              <p style="margin-top:6px;color:#64748b">Authority keys assigned to roles (<code>/permissions</code>)</p>
+            <div class="stats-grid">
+              <div class="card">
+                <h3>Total Organizations</h3>
+                <div class="value" id="stat-orgs">—</div>
+              </div>
+
+              <div class="card">
+                <h3>Total Projects</h3>
+                <div class="value" id="stat-projects">—</div>
+              </div>
+
+              <div class="card">
+                <h3>Sprints</h3>
+                <div class="value" id="stat-sprints">—</div>
+              </div>
+
+              <div class="card">
+                <h3>Tasks</h3>
+                <div class="value" id="stat-tasks">—</div>
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Slug</th>
+                    <th>Organization ID</th>
+                    <th>Status</th>
+                    <th>Visibility</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardProjectsBody"></tbody>
+              </table>
+            </div>
+
+            <div class="page-header" style="margin-top:40px">
+              <div>
+                <h1>Task board</h1>
+                <p style="margin-top:6px;color:#64748b">Use Tasks in the sidebar to view and create work items.</p>
+              </div>
+            </div>
+
+            <div class="card" style="box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05)">
+              <p style="font-size:14px;color:#64748b;line-height:1.6">
+                Kanban columns are not wired to workflow states in this shell. Open <strong>Tasks</strong> for the live
+                list from the API.
+              </p>
             </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Key</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody id="permissionsTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-admin-users" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Admin users</h1>
-              <p style="margin-top:6px;color:#64748b">Administrative accounts (<code>/admin-user</code>)</p>
+          <div id="page-organizations" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Organizations</h1>
+                <p style="margin-top:6px;color:#64748b">Create and manage organizations</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="organizations">+ Add organization</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="admin-users">+ Add admin user</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Created</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orgTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Role</th>
-                  <th>Organization</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="adminUsersTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-projects" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Projects</h1>
-              <p style="margin-top:6px;color:#64748b">Projects within organizations</p>
+          <div id="page-roles" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Roles</h1>
+                <p style="margin-top:6px;color:#64748b">Roles and permission bindings</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="roles">+ Add role</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="projects">+ Add project</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Permission IDs</th>
+                    <th>Created</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rolesTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Organization</th>
-                  <th>Status</th>
-                  <th>Visibility</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="projectsTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-teams" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Teams</h1>
-              <p class="page-note">Member directory via <code>/member-user</code> (same user model as admin; filtered by your permissions).</p>
+          <div id="page-permissions" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Permissions</h1>
+                <p style="margin-top:6px;color:#64748b">Authority keys assigned to roles (<code>/permissions</code>)</p>
+              </div>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="teams">+ Add member</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="permissionsTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Role</th>
-                  <th>Organization</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="teamsTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-sprints" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Sprints</h1>
-              <p style="margin-top:6px;color:#64748b">Sprints linked to projects and workflows</p>
+          <div id="page-admin-users" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Admin users</h1>
+                <p style="margin-top:6px;color:#64748b">Administrative accounts (<code>/admin-user</code>)</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="admin-users">+ Add admin user</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="sprints">+ Add sprint</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Role</th>
+                    <th>Organization</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Project</th>
-                  <th>Workflow</th>
-                  <th>Capacity h</th>
-                  <th>Planned SP</th>
-                  <th>Done SP</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="sprintsTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-workflows" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Workflows</h1>
-              <p style="margin-top:6px;color:#64748b">Workflow definitions per project</p>
+          <div id="page-projects" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Projects</h1>
+                <p style="margin-top:6px;color:#64748b">Projects within organizations</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="projects">+ Add project</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="workflows">+ Add workflow</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Organization</th>
+                    <th>Status</th>
+                    <th>Visibility</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="projectsTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Project</th>
-                  <th>Reusable</th>
-                  <th style="min-width: 200px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="workflowsTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-kanban" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Kanban Board</h1>
-              <p class="page-note">Interactive visual board for task workflow management.</p>
+          <div id="page-teams" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Teams</h1>
+                <p class="page-note">Member directory via <code>/member-user</code> (same user model as admin; filtered
+                  by your permissions).</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="teams">+ Add member</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="tasks">+ Create Task</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Role</th>
+                    <th>Organization</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="teamsTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="kanban-board" id="kanbanBoardContainer" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; min-height: 500px;">
-          </div>
-        </div>
 
-        <div id="page-task-types" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Task Types</h1>
-              <p class="page-note">Manage customized task classifications and visual indicators.</p>
+          <div id="page-sprints" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Sprints</h1>
+                <p style="margin-top:6px;color:#64748b">Sprints linked to projects and workflows</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="sprints">+ Add sprint</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="task-types">+ Add task type</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Project</th>
+                    <th>Workflow</th>
+                    <th>Capacity h</th>
+                    <th>Planned SP</th>
+                    <th>Done SP</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sprintsTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Icon</th>
-                  <th>Color</th>
-                  <th>Project</th>
-                  <th>Workflow</th>
-                  <th style="min-width: 120px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="taskTypesTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-labels" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Labels</h1>
-              <p class="page-note">Create and manage color-coded labels for tagging tasks.</p>
+          <div id="page-workflows" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Workflows</h1>
+                <p style="margin-top:6px;color:#64748b">Workflow definitions per project</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="workflows">+ Add workflow</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="labels">+ Add label</button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Project</th>
+                    <th>Reusable</th>
+                    <th style="min-width: 200px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="workflowsTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Color</th>
-                  <th>Project</th>
-                  <th style="min-width: 120px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="labelsTableBody"></tbody>
-            </table>
-          </div>
-        </div>
 
-        <div id="page-tasks" class="page-panel hidden">
-          <div class="page-header">
-            <div>
-              <h1>Tasks</h1>
-              <p class="page-note">Create, update, and manage workspace tasks.</p>
+          <div id="page-kanban" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Kanban Board</h1>
+                <p class="page-note">Interactive visual board for task workflow management.</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="tasks">+ Create Task</button>
             </div>
-            <button type="button" class="primary-btn crud-add" data-view="tasks">+ Add task</button>
+            <div id="kanbanBoardContainer" class="kanban">
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Priority</th>
-                  <th>Project</th>
-                  <th>Sprint</th>
-                  <th>Type</th>
-                  <th>Due</th>
-                  <th style="min-width: 120px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="tasksTableBody"></tbody>
-            </table>
+
+          <div id="page-task-types" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Task Types</h1>
+                <p class="page-note">Manage customized task classifications and visual indicators.</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="task-types">+ Add task type</button>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Icon</th>
+                    <th>Color</th>
+                    <th>Project</th>
+                    <th>Workflow</th>
+                    <th style="min-width: 120px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="taskTypesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="page-labels" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Labels</h1>
+                <p class="page-note">Create and manage color-coded labels for tagging tasks.</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="labels">+ Add label</button>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Color</th>
+                    <th>Project</th>
+                    <th style="min-width: 120px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="labelsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="page-tasks" class="page-panel hidden">
+            <div class="page-header">
+              <div>
+                <h1>Tasks</h1>
+                <p class="page-note">Create, update, and manage workspace tasks.</p>
+              </div>
+              <button type="button" class="primary-btn crud-add" data-view="tasks">+ Add task</button>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Project</th>
+                    <th>Sprint</th>
+                    <th>Type</th>
+                    <th>Due</th>
+                    <th style="min-width: 120px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
-  </div>
+      </main>
+    </div>
   </div>
 
   <div class="modal-overlay" id="dynamicCrudModal">
@@ -1014,8 +1095,7 @@
     // VELOCITYDESK REAL API INTEGRATION
     // =========================
 
-    const API_BASE_URL = "http://localhost:9090";
-
+    const API_BASE_URL = window.location.origin;
     const API = {
       async request(endpoint, method = 'GET', body = null) {
         const token = localStorage.getItem('accessToken');
@@ -1262,4 +1342,5 @@
 
   </script>
 </body>
+
 </html>

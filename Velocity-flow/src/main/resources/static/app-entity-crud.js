@@ -1451,6 +1451,7 @@ function registerEntityCrud(API) {
     crudState = { view: null, mode: null, fields: [] };
   }
 
+  const minimizedColumns = new Set();
   async function renderKanbanBoard() {
     const kanbanCont = document.getElementById('kanbanBoardContainer');
     if (!kanbanCont) return;
@@ -1459,7 +1460,8 @@ function registerEntityCrud(API) {
     try {
       const res = await API.request('/task-dashboard').catch(() => ({}));
       const rawKeys = res.dataMap && res.dataMap.keysToShow ? res.dataMap.keysToShow : [];
-      const keys = Array.isArray(rawKeys) && rawKeys.length > 0 ? rawKeys : ['OPEN', 'IN PROGRESS', 'DONE'];
+      // Only keys to show will be shown
+      const keys = Array.isArray(rawKeys) && rawKeys.length > 0 ? rawKeys : [];
       const tasks = Array.isArray(res.dataList) ? res.dataList : [];
 
       if (ENTITY_CONFIG.tasks.enrichRows) {
@@ -1467,10 +1469,11 @@ function registerEntityCrud(API) {
       }
 
       keys.forEach((key) => {
+        const isMinimized = minimizedColumns.has(key);
         const col = document.createElement('div');
-        col.className = 'kanban-column';
-        col.style.flex = '1';
-        col.style.minWidth = '300px';
+        col.className = 'kanban-column' + (isMinimized ? ' minimized' : '');
+        col.style.flex = isMinimized ? '0 0 auto' : '0 0 320px';
+        col.style.flexShrink = '0';
         col.style.background = '#f8fafc';
         col.style.borderRadius = '12px';
         col.style.padding = '16px';
@@ -1485,17 +1488,44 @@ function registerEntityCrud(API) {
         if (key.toUpperCase().includes('PROG')) colColor = '#d97706';
         if (key.toUpperCase().includes('DONE') || key.toUpperCase().includes('COMP')) colColor = '#16a34a';
 
-        col.innerHTML = `
-          <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; color: ${colColor};">
-            <span>🔵 ${key.toUpperCase()}</span> <span class="count">${matchingTasks.length}</span>
-          </h3>
-          <div class="kanban-cards" style="display: flex; flex-direction: column; gap: 12px; min-height: 200px;"></div>
-        `;
+        const header = document.createElement('h3');
+        const headerJustify = isMinimized ? 'flex-start' : 'space-between';
+        header.style.cssText = `font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: ${headerJustify}; align-items: center; color: ${colColor};`;
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = `🔵 ${key.toUpperCase()}`;
+        header.appendChild(titleSpan);
 
-        const cardsCont = col.querySelector('.kanban-cards');
+        if (!isMinimized) {
+          const countSpan = document.createElement('span');
+          countSpan.className = 'count';
+          countSpan.textContent = matchingTasks.length;
+          header.appendChild(countSpan);
+        }
+
+        const minBtn = document.createElement('button');
+        minBtn.type = 'button';
+        minBtn.style.cssText = 'background: none; border: none; cursor: pointer; font-size: 12px; margin-left: 4px; color: #64748b; flex-shrink: 0;';
+        minBtn.textContent = isMinimized ? '➕' : '➖';
+        minBtn.title = isMinimized ? 'Expand' : 'Minimize';
+        minBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (isMinimized) minimizedColumns.delete(key);
+          else minimizedColumns.add(key);
+          renderKanbanBoard();
+        };
+        header.appendChild(minBtn);
+
+        col.appendChild(header);
+
+        const cardsCont = document.createElement('div');
+        cardsCont.className = 'kanban-cards';
+        cardsCont.style.cssText = 'display: flex; flex-direction: column; gap: 12px; min-height: 200px;';
+        col.appendChild(cardsCont);
 
         col.addEventListener('dragover', (e) => {
           e.preventDefault();
+          if (isMinimized) return;
           col.style.borderColor = '#3b82f6';
           col.style.background = '#f1f5f9';
         });
@@ -1513,25 +1543,9 @@ function registerEntityCrud(API) {
           const taskId = parseInt(taskIdStr, 10);
           if (Number.isNaN(taskId)) return;
 
-          const task = tasks.find((t) => t.id === taskId);
-          if (!task) return;
-
           try {
-            await API.request('/tasks', 'PUT', {
-              id: task.id,
-              projectId: task.projectId,
-              sprintId: task.sprintId,
-              taskTypeId: task.taskTypeId,
-              parentTaskId: task.parentTaskId,
-              taskLevel: task.taskLevel != null ? task.taskLevel : 1,
-              rankOrder: task.rankOrder != null ? task.rankOrder : 1,
-              assigneeId: task.assigneeId,
-              title: task.title,
-              priority: task.priority || 'MEDIUM',
-              dueDate: task.dueDate,
-              labelIds: task.labelIds,
-              status: key
-            });
+            // Update status via this api: update-status/{id}/{status}
+            await API.request(`/tasks/update-status/${taskId}/${key}`, 'PATCH');
             window.showToast(`Moved task to ${key}`);
             renderKanbanBoard();
           } catch (err) {
